@@ -2,6 +2,7 @@ import Head from "next/head";
 import { Inter } from "next/font/google";
 import styles from "@/styles/Home.module.css";
 import { useForm, SubmitHandler, useFormContext } from "react-hook-form";
+import { FC } from "react";
 const inter = Inter({ subsets: ["latin"] });
 
 type Inputs = {
@@ -18,7 +19,7 @@ function NestedInput() {
   return <input {...register("test")} />;
 }
 
-export default function Home() {
+const InnerComponent: FC = () => {
   const {
     register,
     handleSubmit,
@@ -27,8 +28,18 @@ export default function Home() {
   } = useForm<Inputs>();
   const onSubmit: SubmitHandler<Inputs> = (data) => console.log(data);
 
-  console.log(watch("example")); // watch input value by passing the name of it
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <input defaultValue="test" {...register("example")} />
+      <input {...register("exampleRequired", { required: true })} />
+      <NestedInput />
+      {errors.exampleRequired && <span>This field is required</span>}
+      <input type="submit" />
+    </form>
+  );
+};
 
+export default function Home() {
   return (
     <>
       <Head>
@@ -38,13 +49,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={`${styles.main} ${inter.className}`}>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <input defaultValue="test" {...register("example")} />
-          <input {...register("exampleRequired", { required: true })} />
-          <NestedInput />
-          {errors.exampleRequired && <span>This field is required</span>}
-          <input type="submit" />
-        </form>
+        <InnerComponent />
       </main>
     </>
   );
