@@ -2,7 +2,10 @@ import Head from "next/head";
 import { Inter } from "next/font/google";
 import styles from "@/styles/Home.module.css";
 import { useForm, SubmitHandler, useFormContext } from "react-hook-form";
+import { createContext, useContext } from "react";
 const inter = Inter({ subsets: ["latin"] });
+
+const TestContext = createContext<string | null>(null);
 
 type Inputs = {
   example: string;
@@ -11,11 +14,9 @@ type Inputs = {
 };
 
 function NestedInput() {
-  const { register } = useFormContext(); // retrieve all hook methods
+  const test = useContext(TestContext);
 
-  console.log(register);
-
-  return <input {...register("test")} />;
+  return <>hello {test}</>;
 }
 
 export default function Home() {
@@ -38,13 +39,15 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={`${styles.main} ${inter.className}`}>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <input defaultValue="test" {...register("example")} />
-          <input {...register("exampleRequired", { required: true })} />
-          <NestedInput />
-          {errors.exampleRequired && <span>This field is required</span>}
-          <input type="submit" />
-        </form>
+        <TestContext.Provider value="test">
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <input defaultValue="test" {...register("example")} />
+            <input {...register("exampleRequired", { required: true })} />
+            <NestedInput />
+            {errors.exampleRequired && <span>This field is required</span>}
+            <input type="submit" />
+          </form>
+        </TestContext.Provider>
       </main>
     </>
   );
